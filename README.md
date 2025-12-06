@@ -19,8 +19,7 @@ Para resolver esses problemas, será desenvolvido um **Sistema Escolar completo*
 ✔ Dados dos alunos  
 ✔ Disciplinas e cursos  
 ✔ Professores e turmas  
-✔ Matrículas dos alunos por disciplina  
-✔ Histórico de notas e frequência  
+✔ Matrículas dos alunos por disciplina
 
 ---
 
@@ -223,8 +222,138 @@ CREATE TABLE Matricula (
     id_curso INT REFERENCES Curso(id_curso) ON DELETE CASCADE,
     id_turma INT REFERENCES Turma(id_turma) ON DELETE CASCADE
 );
-
 ```
 
+---
 
+## Inserts utilizados para popular as tabelas com informações aleatorias
+inserts criados com auxilio de inteligencia artificial
+
+## Alunos
+```sql
+WITH nomes AS (
+    SELECT unnest(ARRAY[
+        'Ana','Bruno','Carla','Daniel','Eduardo','Fernanda','Gustavo','Helena','Igor','Julia',
+        'Lucas','Mariana','Natalia','Otavio','Paula','Rafael','Sofia','Tiago','Vanessa','Victor'
+    ]) AS nome
+),
+sobrenomes AS (
+    SELECT unnest(ARRAY[
+        'Silva','Souza','Oliveira','Santos','Lima','Costa','Pereira','Almeida','Rocha','Carvalho',
+        'Fernandes','Gomes','Martins','Barbosa','Ribeiro','Mendes','Cardoso','Azevedo','Cavalcanti','Teixeira'
+    ]) AS sobrenome
+)
+INSERT INTO Aluno (nome, data_nascimento, email, telefone, rua, numero, bairro, cidade)
+SELECT 
+    n.nome || ' ' || s.sobrenome AS nome,
+    date '2010-01-01' + (random()*4000)::int AS data_nascimento,
+    lower(n.nome || '.' || s.sobrenome || gs || '@email.com') AS email,
+    '+55' || (1000000000 + (random()*899999999)::int) AS telefone,
+    'Rua ' || gs AS rua,
+    (1 + (random()*1000)::int)::text AS numero,
+    'Bairro ' || (1 + (random()*50)::int) AS bairro,
+    'Cidade ' || (1 + (random()*50)::int) AS cidade
+FROM generate_series(1,25) gs
+CROSS JOIN nomes n
+CROSS JOIN sobrenomes s
+LIMIT 500;
+```
+## Carteirinhas
+```sql
+INSERT INTO Carteirinha (numero, data_emissao, validade, id_aluno)
+SELECT 
+    'CART-' || gs AS numero,
+    now() - (random()*1000)::int * interval '1 day' AS data_emissao,
+    now() + (365 + random()*365)::int * interval '1 day' AS validade,
+    gs AS id_aluno
+FROM generate_series(1,500) gs;
+```
+## Cursos
+```sql
+WITH cursos AS (
+    SELECT unnest(ARRAY[
+        '1º Ano Fundamental','2º Ano Fundamental','3º Ano Fundamental','4º Ano Fundamental','5º Ano Fundamental',
+        '6º Ano Fundamental','7º Ano Fundamental','8º Ano Fundamental','9º Ano Fundamental',
+        '1º Ano Médio','2º Ano Médio','3º Ano Médio'
+    ]) AS nome
+)
+INSERT INTO Curso (nome, descricao, duracao, carga_horaria)
+SELECT 
+    c.nome || ' ' || gs AS nome,
+    'Série ' || c.nome || ' da Escola Básica' AS descricao,
+    1 AS duracao,
+    800 + (random()*200)::int AS carga_horaria
+FROM cursos c
+CROSS JOIN generate_series(1,50) gs
+LIMIT 500;
+```
+## Professores
+```sql
+WITH prof_nomes AS (
+    SELECT unnest(ARRAY[
+        'Carlos','Marcos','Paulo','Roberta','Tatiana','Renato','Flavia','Eduardo','Simone','Marcelo'
+    ]) AS nome
+),
+prof_sobrenomes AS (
+    SELECT unnest(ARRAY[
+        'Santos','Almeida','Costa','Fernandes','Ribeiro','Barbosa','Mendes','Cardoso','Rocha','Lima'
+    ]) AS sobrenome
+),
+disciplinas AS (
+    SELECT unnest(ARRAY['Matemática','Português','Ciências','História','Geografia','Educação Física','Arte','Inglês']) AS disciplina
+)
+INSERT INTO Professor (nome, email, telefones, especialidades)
+SELECT 
+    n.nome || ' ' || s.sobrenome AS nome,
+    lower(n.nome || '.' || s.sobrenome || gs || '@email.com') AS email,
+    '+55' || (1000000000 + (random()*899999999)::int) AS telefones,
+    d.disciplina AS especialidades
+FROM generate_series(1,25) gs
+CROSS JOIN prof_nomes n
+CROSS JOIN prof_sobrenomes s
+CROSS JOIN LATERAL (
+    SELECT disciplina 
+    FROM disciplinas 
+    ORDER BY random() 
+    LIMIT 1
+) d
+LIMIT 500;
+```
+## Disciplinas
+```sql
+WITH disciplinas AS (
+    SELECT unnest(ARRAY[
+        'Matemática','Português','Ciências','História','Geografia','Educação Física','Arte','Inglês'
+    ]) AS nome
+)
+INSERT INTO Disciplina (nome, descricao, id_curso, id_professor)
+SELECT 
+    d.nome || ' ' || gs AS nome,
+    'Disciplina de ' || d.nome || ' para alunos do ensino básico' AS descricao,
+    (1 + (random()*499)::int) AS id_curso,
+    (1 + (random()*499)::int) AS id_professor
+FROM disciplinas d
+CROSS JOIN generate_series(1,75) gs
+LIMIT 500;
+```
+## Turmas
+```sql
+INSERT INTO Turma (semestre_sala, horario, ano)
+SELECT 
+    'Sala ' || (1 + (random()*50)::int) AS semestre_sala,
+    (7 + (random()*5)::int) || ':00 - ' || (8 + (random()*5)::int) || ':50' AS horario,
+    2020 + (random()*5)::int AS ano
+FROM generate_series(1,500) gs;
+```
+## Matricula
+```sql
+INSERT INTO Matricula (data_matricula, status, id_aluno, id_curso, id_turma)
+SELECT 
+    now() - (random()*1000)::int * interval '1 day' AS data_matricula,
+    CASE WHEN random() < 0.9 THEN 'Ativo' ELSE 'Inativo' END AS status,
+    (1 + (random()*499)::int) AS id_aluno,
+    (1 + (random()*499)::int) AS id_curso,
+    (1 + (random()*499)::int) AS id_turma
+FROM generate_series(1,500) gs;
+```
 
