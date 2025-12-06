@@ -6,7 +6,7 @@ Este projeto representa um **Sistema Escolar** desenvolvido para organizar e ger
 
 ## 📌 1. Cenário
 
-A escola fictícia **LearnHub** (nome pode ser modificado) é uma instituição de ensino fundamental e médio que atende mais de 1.200 alunos distribuídos em 30 turmas – além de professores, coordenadores e funcionários administrativos.
+A escola fictícia **LearnHub** é uma instituição de ensino fundamental e médio
 
 Atualmente a escola enfrenta dificuldades com:
 - Registros manuais e informações duplicadas  
