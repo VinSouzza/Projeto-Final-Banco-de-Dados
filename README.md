@@ -356,4 +356,32 @@ SELECT
     (1 + (random()*499)::int) AS id_turma
 FROM generate_series(1,500) gs;
 ```
+---
 
+## Exemplo funcional de um CRUD na tabela aluno
+O código é apenas uma demonstração pois depois que eu executei o DELETE o SELECT e o UPDATE não vão mais funcionar pois não existe mais id 501 na tabela de alunos.
+
+Caso queira testar, utilize o INSERT novamente e use o novo id gerado automaticamente
+
+## INSERT (CREATE)
+```sql
+INSERT INTO aluno (nome, data_nascimento, email, telefone, rua, numero, bairro, cidade)
+VALUES ('Vinicius Oliveira', '2006-05-10', 'vinicius@gmail.com', '16996655444', 'Maria Jose Abel Freitas', 614, 'Garden', 'Franca')
+```
+## SELECT (READ)
+```sql
+SELECT *
+FROM aluno
+WHERE id_aluno = 501 AND nome LIKE 'Vinicius%'
+```
+## UPDATE
+```sql
+UPDATE aluno
+SET nome = 'Vinicius Souza'
+WHERE id_aluno = 501 AND email = 'vinicius@gmail.com'
+```
+## DELETE
+```sql
+DELETE FROM aluno
+WHERE id_aluno = 501
+```
