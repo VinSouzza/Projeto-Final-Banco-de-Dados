@@ -51,40 +51,39 @@ O sistema contém **7 entidades principais**, incluindo uma entidade associativa
 ### **2) Professor**
 - id_professor (PK)  
 - nome  
-- formacao  
 - email  
+- telefones (multivalorado)  
 - especialidades (multivalorado)
 
 ### **3) Curso**
 - id_curso (PK)  
-- nome_curso  
+- nome  
 - descricao  
-- carga_horaria  
+- duracao (anos)
 
 ### **4) Disciplina**
 - id_disciplina (PK)  
-- nome_disciplina  
-- ementa  
+- nome  
+- descricao  
 - carga_horaria  
 
 ### **5) Turma**
 - id_turma (PK)  
-- nome_turma  
-- ano_letivo  
-- turno  
+- semestre  
+- ano  
+- horario (composto: dia_da_semana, hora_inicio, hora_fim)  
+- sala  
 
 ### **6) Carteirinha** (Relacionamento 1:1 com Aluno)
 - id_carteirinha (PK)  
+- numero  
 - data_emissao  
-- validade  
-- id_aluno (FK, UNIQUE)
+- validade (derivado)
 
-### **7) Matricula** (Entidade Associativa – N:N)
+### **7) Matrícula** (Entidade Associativa – N:N entre Aluno e Turma)
 - id_matricula (PK)  
-- id_aluno (FK)  
-- id_disciplina (FK)  
-- nota_final  
-- frequencia  
+- data_matricula  
+- status (ativa, trancada, concluída)
 
 ---
 
@@ -92,7 +91,7 @@ O sistema contém **7 entidades principais**, incluindo uma entidade associativa
 
 | Tipo de atributo | Onde aparece |
 |------------------|--------------|
-| **Simples** | nome, email, ementa, turno… |
+| **Simples** | nome, email, descricao … |
 | **Composto** | endereço do aluno |
 | **Multivalorado** | telefones, especialidades |
 | **Derivado** | idade |
