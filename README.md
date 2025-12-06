@@ -359,9 +359,9 @@ FROM generate_series(1,500) gs;
 ---
 
 ## Exemplo funcional de um CRUD na tabela aluno
-O código é apenas uma demonstração pois depois que eu executei o DELETE o SELECT e o UPDATE não vão mais funcionar pois não existe mais id 501 na tabela de alunos.
+O código é apenas uma **demonstração** pois depois que eu executei o DELETE o SELECT e o UPDATE não vão mais funcionar pois não existe mais id 501 na tabela de alunos.
 
-Caso queira testar, utilize o INSERT novamente e use o novo id gerado automaticamente
+Caso queira testar, **utilize o INSERT novamente e use o novo id gerado automaticamente**
 
 ## INSERT (CREATE)
 ```sql
@@ -385,3 +385,141 @@ WHERE id_aluno = 501 AND email = 'vinicius@gmail.com'
 DELETE FROM aluno
 WHERE id_aluno = 501
 ```
+---
+# Consultas SQL 
+
+A seguir estão **10 consultas SQL** acompanhadas de suas respectivas **perguntas**, todas utilizando:  
+**SELECT, WHERE, ORDER BY e JOIN**.
+
+---
+
+## 1.Listar todos os alunos com suas carteirinhas  
+**Pergunta:** *Quais alunos já possuem carteirinha emitida?*
+
+```sql
+SELECT 
+    a.id_aluno,
+    a.nome AS aluno,
+    c.numero AS numero_carteirinha,
+    c.data_emissao
+FROM Aluno a
+JOIN Carteirinha c ON c.id_aluno = a.id_aluno
+ORDER BY a.nome;
+```
+## 2.Listar professores e as disciplinas que eles ministram
+**Pergunta:** *Quais disciplinas cada professor está responsável por ensinar?*
+
+```sql
+SELECT 
+    p.nome AS professor,
+    d.nome AS disciplina,
+    d.descricao
+FROM Professor p
+JOIN Disciplina d ON d.id_professor = p.id_professor
+ORDER BY p.nome;
+```
+## 3.Exibir todas as matrículas com nome do aluno e nome do curso
+**Pergunta:** *Quais alunos estão matriculados em quais cursos?*
+
+```sql
+SELECT 
+    m.id_matricula,
+    a.nome AS aluno,
+    c.nome AS curso,
+    m.data_matricula,
+    m.status
+FROM Matricula m
+JOIN Aluno a ON a.id_aluno = m.id_aluno
+JOIN Curso c ON c.id_curso = m.id_curso
+ORDER BY a.nome;
+```
+## 4.Ver alunos matriculados em um curso específico
+**Pergunta:** *Quem está matriculado no curso "1º Ano Fundamental"?*
+
+```sql
+SELECT 
+    a.nome AS aluno,
+    c.nome AS curso
+FROM Matricula m
+JOIN Aluno a ON a.id_aluno = m.id_aluno
+JOIN Curso c ON c.id_curso = m.id_curso
+WHERE c.nome LIKE '1º Ano Fundamental%'
+ORDER BY a.nome;
+```
+## 5.Listar disciplinas de um curso específico
+**Pergunta:** *Quais disciplinas pertencem ao curso X?*
+
+```sql
+SELECT 
+    d.nome AS disciplina,
+    c.nome AS curso
+FROM Disciplina d
+JOIN Curso c ON d.id_curso = c.id_curso
+WHERE c.nome like '1º Ano Fundamental %'
+ORDER BY d.nome;
+```
+## 6.Listar todas as turmas e seus horários
+**Pergunta:** *Quais são as turmas por ano e horário?*
+
+```sql
+SELECT 
+    id_turma,
+    semestre_sala,
+    horario,
+    ano
+FROM Turma
+ORDER BY ano DESC, semestre_sala;
+```
+## 7.Ver quais alunos estão em uma turma específica
+**Pergunta:** *Quem está na turma ID = 3?*
+
+```sql
+SELECT 
+    a.nome AS aluno,
+    t.semestre_sala,
+    t.horario,
+    t.ano
+FROM Matricula m
+JOIN Aluno a ON a.id_aluno = m.id_aluno
+JOIN Turma t ON t.id_turma = m.id_turma
+WHERE t.id_turma = 3
+ORDER BY a.nome;
+```
+## 8.Ver todos os cursos e seus professores responsáveis
+**Pergunta:** *Quais professores estão atribuídos às disciplinas de cada curso?*
+
+```sql
+SELECT 
+    c.nome AS curso,
+    d.nome AS disciplina,
+    p.nome AS professor
+FROM Curso c
+JOIN Disciplina d ON d.id_curso = c.id_curso
+LEFT JOIN Professor p ON p.id_professor = d.id_professor
+ORDER BY c.nome, d.nome;
+```
+## 9.Listar alunos sem carteirinha
+**Pergunta:** *Quem ainda não possui carteirinha emitida?*
+
+```sql
+SELECT 
+    a.id_aluno,
+    a.nome
+FROM Aluno a
+LEFT JOIN Carteirinha c ON c.id_aluno = a.id_aluno
+WHERE c.id_carteirinha IS NULL
+ORDER BY a.nome;
+```
+## 10.Consultar cursos com maior carga horária
+**Pergunta:** *Quais são os cursos mais longos?*
+
+```sql
+SELECT 
+    id_curso,
+    nome,
+    carga_horaria
+FROM Curso
+ORDER BY carga_horaria DESC;
+```
+
+
